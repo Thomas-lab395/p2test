@@ -72,4 +72,21 @@ public class DataStore {
     public static List<Evento> getEventos() {
         return eventos;
     }
+    
+    public static int contarEventosPorTipo(List<Evento> lista, String tipo, int index) {
+        if (index >= lista.size()) return 0;
+        int suma = lista.get(index).getTipo().equalsIgnoreCase(tipo) ? 1 : 0;
+            return suma + contarEventosPorTipo(lista, tipo, index + 1);
+}
+
+    public static double sumarMontos(List<Evento> lista, int index) {
+        if (index >= lista.size()) return 0;
+            return lista.get(index).getMontoRenta() + sumarMontos(lista, index + 1);
+    }
+
+     public static double sumarMultas(List<Evento> lista, int index) {
+            if (index >= lista.size()) return 0;
+            double multa = lista.get(index).isCancelado() ? lista.get(index).getMulta() : 0;
+                return multa + sumarMultas(lista, index + 1);
+    }
 }

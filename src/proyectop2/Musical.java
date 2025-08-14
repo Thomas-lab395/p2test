@@ -3,25 +3,20 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package proyectop2;
-import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
-/**
- *
- * @author Mayra Bardales
- */
 
 public class Musical extends Evento {
     private TipoMusica tipoMusica;
     private List<String> equipoMontaje;
 
-    public Musical(String codigo, String titulo, String descripcion, LocalDate fecha, double montoRenta,
+    public Musical(String codigo, String titulo, String descripcion, Calendar fecha, double montoRenta,
                    TipoMusica tipoMusica) {
         super(codigo, titulo, descripcion, fecha, montoRenta);
-        this.capacidadMaxima = 25000;
+        setCapacidadMaxima(25000);
         this.tipoMusica = tipoMusica;
         this.equipoMontaje = new ArrayList<>();
-        this.montoRenta += montoRenta * 0.30; // Seguro 30%
     }
 
     public void agregarMiembroMontaje(String nombre) {
@@ -29,5 +24,17 @@ public class Musical extends Evento {
     }
 
     @Override
-    public String getTipo() { return "MUSICAL"; }
+    public String getTipo() {
+        return "MUSICAL";
+    }
+
+    @Override
+    public double getMontoRenta() {
+        // Añade un seguro del 30% al monto base
+        return montoRenta * 1.3;
+    }
+
+    private void setCapacidadMaxima(int capacidad) {
+        this.capacidadMaxima = capacidad;
+    }
 }

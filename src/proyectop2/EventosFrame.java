@@ -4,41 +4,38 @@
  */
 package proyectop2;
 
+import com.toedter.calendar.JDateChooser;
 import javax.swing.*;
 import java.awt.*;
-import java.time.LocalDate; 
-import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 
-/**
- *
- * @author Mayra Bardales
- */
+public class EventosFrame {
 
-
-public class EventosFrame extends JFrame {
     private Usuario usuario;
-    private DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private JFrame frame;
 
     public EventosFrame(Usuario usuario) {
         this.usuario = usuario;
 
-        setTitle("Administración de Eventos");
-        setSize(400, 300);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setLayout(new GridLayout(5, 1, 10, 10));
+        // Crear la ventana principal
+        frame = new JFrame("Administración de Eventos");
+        frame.setSize(400, 300);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+        frame.setLayout(new GridLayout(5, 1, 10, 10));
 
+        // Botones
         JButton btnCrear = new JButton("Crear Evento");
         JButton btnEliminar = new JButton("Eliminar Evento");
         JButton btnEditar = new JButton("Editar Evento");
         JButton btnVer = new JButton("Ver Evento");
         JButton btnRegresar = new JButton("Regresar");
 
-        add(btnCrear);
-        add(btnEliminar);
-        add(btnEditar);
-        add(btnVer);
-        add(btnRegresar);
+        frame.add(btnCrear);
+        frame.add(btnEliminar);
+        frame.add(btnEditar);
+        frame.add(btnVer);
+        frame.add(btnRegresar);
 
         // Restricciones por tipo de usuario
         if (usuario instanceof Limitado) {
@@ -46,49 +43,78 @@ public class EventosFrame extends JFrame {
             btnEditar.setEnabled(false);
         }
 
-        // Acción crear evento
+        // Acciones
         btnCrear.addActionListener(e -> crearEvento());
-
-        // Acción eliminar evento
         btnEliminar.addActionListener(e -> eliminarEvento());
-
-        // Acción editar evento
         btnEditar.addActionListener(e -> editarEvento());
-
-        // Acción ver evento
         btnVer.addActionListener(e -> verEvento());
+        btnRegresar.addActionListener(e -> frame.dispose());
 
-        // Regresar
-        btnRegresar.addActionListener(e -> dispose());
+        // Mostrar ventana
+        frame.setVisible(true);
     }
 
     private void crearEvento() {
         String[] tipos = {"DEPORTIVO", "MUSICAL", "RELIGIOSO"};
-        String tipo = (String) JOptionPane.showInputDialog(this, "Seleccione tipo de evento", "Tipo",
+        String tipo = (String) JOptionPane.showInputDialog(frame, "Seleccione tipo de evento", "Tipo",
                 JOptionPane.QUESTION_MESSAGE, null, tipos, tipos[0]);
 
         if (tipo == null) return;
 
-        String codigo = JOptionPane.showInputDialog(this, "Código único del evento:");
-        String titulo = JOptionPane.showInputDialog(this, "Título del evento:");
-        String descripcion = JOptionPane.showInputDialog(this, "Descripción:");
-        String fechaStr = JOptionPane.showInputDialog(this, "Fecha (dd/MM/yyyy):");
-        double monto = Double.parseDouble(JOptionPane.showInputDialog(this, "Monto de renta:"));
+        String codigo = JOptionPane.showInputDialog(frame, "Código único del evento:");
+        if (codigo == null || codigo.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "Código inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        String titulo = JOptionPane.showInputDialog(frame, "Título del evento:");
+        if (titulo == null || titulo.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "Título inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        String descripcion = JOptionPane.showInputDialog(frame, "Descripción:");
+        if (descripcion == null) descripcion = "";
 
-        LocalDate fecha = LocalDate.parse(fechaStr, dateFormat);
+        double monto;
+        try {
+            monto = Double.parseDouble(JOptionPane.showInputDialog(frame, "Monto de renta:"));
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(frame, "Monto inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
+        // Selector de fecha
+        JDateChooser dateChooser = new JDateChooser();
+        dateChooser.setDateFormatString("dd/MM/yyyy");
+        dateChooser.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+
+        int option = JOptionPane.showConfirmDialog(frame, dateChooser, "Seleccione la fecha",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (option != JOptionPane.OK_OPTION) {
+            JOptionPane.showMessageDialog(frame, "Operación cancelada.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        java.util.Date fechaDate = dateChooser.getDate();
+        if (fechaDate == null) {
+            JOptionPane.showMessageDialog(frame, "Fecha inválida.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Calendar fecha = Calendar.getInstance();
+        fecha.setTime(fechaDate);
         Evento evento = null;
 
         switch (tipo) {
             case "DEPORTIVO" -> {
-                String eq1 = JOptionPane.showInputDialog(this, "Nombre equipo 1:");
-                String eq2 = JOptionPane.showInputDialog(this, "Nombre equipo 2:");
-                TipoDeporte deporte = (TipoDeporte) JOptionPane.showInputDialog(this, "Tipo de deporte:",
+                String eq1 = JOptionPane.showInputDialog(frame, "Nombre equipo 1:");
+                String eq2 = JOptionPane.showInputDialog(frame, "Nombre equipo 2:");
+                TipoDeporte deporte = (TipoDeporte) JOptionPane.showInputDialog(frame, "Tipo de deporte:",
                         "Deporte", JOptionPane.QUESTION_MESSAGE, null, TipoDeporte.values(), TipoDeporte.FUTBOL);
                 evento = new Deportivo(codigo, titulo, descripcion, fecha, monto, eq1, eq2, deporte);
             }
             case "MUSICAL" -> {
-                TipoMusica musica = (TipoMusica) JOptionPane.showInputDialog(this, "Tipo de música:",
+                TipoMusica musica = (TipoMusica) JOptionPane.showInputDialog(frame, "Tipo de música:",
                         "Música", JOptionPane.QUESTION_MESSAGE, null, TipoMusica.values(), TipoMusica.POP);
                 evento = new Musical(codigo, titulo, descripcion, fecha, monto, musica);
             }
@@ -99,83 +125,108 @@ public class EventosFrame extends JFrame {
 
         if (DataStore.agregarEvento(evento)) {
             usuario.agregarEvento(codigo);
-            JOptionPane.showMessageDialog(this, "Evento creado con éxito.");
+            JOptionPane.showMessageDialog(frame, "Evento creado con éxito.");
         } else {
-            JOptionPane.showMessageDialog(this, "El código ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "El código ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void eliminarEvento() {
-        String codigo = JOptionPane.showInputDialog(this, "Código del evento a eliminar:");
+        String codigo = JOptionPane.showInputDialog(frame, "Código del evento a eliminar:");
         Evento e = DataStore.buscarEvento(codigo);
 
         if (e == null) {
-            JOptionPane.showMessageDialog(this, "Evento no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Evento no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         if (!usuario.getEventosCreados().contains(codigo)) {
-            JOptionPane.showMessageDialog(this, "Solo el creador puede eliminar este evento.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Solo el creador puede eliminar este evento.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Calcular multa según reglas
-        if (LocalDate.now().plusDays(1).isAfter(e.getFecha()) && !(e instanceof Religioso)) {
+        Calendar ahora = Calendar.getInstance();
+        Calendar fechaEvento = e.getFecha();
+        Calendar fechaLimite = (Calendar) fechaEvento.clone();
+        fechaLimite.add(Calendar.DAY_OF_MONTH, -1);
+
+        if (ahora.after(fechaLimite) && !(e instanceof Religioso)) {
             e.cancelar(e.getMontoRenta() * 0.50);
         } else {
             e.cancelar(0);
         }
 
         DataStore.eliminarEvento(codigo);
-        JOptionPane.showMessageDialog(this, "Evento cancelado. Multa: " + e.getMulta());
+        JOptionPane.showMessageDialog(frame, "Evento cancelado. Multa: " + e.getMulta());
     }
 
     private void editarEvento() {
-        String codigo = JOptionPane.showInputDialog(this, "Código del evento a editar:");
+        String codigo = JOptionPane.showInputDialog(frame, "Código del evento a editar:");
         Evento e = DataStore.buscarEvento(codigo);
 
         if (e == null) {
-            JOptionPane.showMessageDialog(this, "Evento no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Evento no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        String nuevoTitulo = JOptionPane.showInputDialog(this, "Nuevo título:", e.getTitulo());
-        String nuevaDescripcion = JOptionPane.showInputDialog(this, "Nueva descripción:", e.getDescripcion());
+        String nuevoTitulo = JOptionPane.showInputDialog(frame, "Nuevo título:", e.getTitulo());
+        String nuevaDescripcion = JOptionPane.showInputDialog(frame, "Nueva descripción:", e.getDescripcion());
 
         e.titulo = nuevoTitulo;
         e.descripcion = nuevaDescripcion;
 
         if (e instanceof Deportivo dep) {
-            String jugador = JOptionPane.showInputDialog(this, "Agregar jugador a equipo 1:");
+            String jugador = JOptionPane.showInputDialog(frame, "Agregar jugador a equipo 1:");
             dep.agregarJugadorEquipo1(jugador);
         } else if (e instanceof Musical mus) {
-            String miembro = JOptionPane.showInputDialog(this, "Agregar miembro al equipo de montaje:");
+            String miembro = JOptionPane.showInputDialog(frame, "Agregar miembro al equipo de montaje:");
             mus.agregarMiembroMontaje(miembro);
         } else if (e instanceof Religioso rel) {
-            int convertidos = Integer.parseInt(JOptionPane.showInputDialog(this, "Cantidad de personas convertidas:"));
-            rel.setPersonasConvertidas(convertidos);
+            try {
+                int convertidos = Integer.parseInt(JOptionPane.showInputDialog(frame, "Cantidad de personas convertidas:"));
+                rel.setPersonasConvertidas(convertidos);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(frame, "Número inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
         }
 
-        JOptionPane.showMessageDialog(this, "Evento editado con éxito.");
+        JOptionPane.showMessageDialog(frame, "Evento editado con éxito.");
     }
 
     private void verEvento() {
-        String codigo = JOptionPane.showInputDialog(this, "Código del evento:");
+        String codigo = JOptionPane.showInputDialog(frame, "Código del evento:");
         Evento e = DataStore.buscarEvento(codigo);
 
         if (e == null) {
-            JOptionPane.showMessageDialog(this, "Evento no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Evento no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+
+        Calendar fechaEvento = e.getFecha();
+        String fechaFormateada = String.format("%02d/%02d/%04d",
+                fechaEvento.get(Calendar.DAY_OF_MONTH),
+                fechaEvento.get(Calendar.MONTH) + 1,
+                fechaEvento.get(Calendar.YEAR));
 
         String info = "Código: " + e.getCodigo() +
                 "\nTítulo: " + e.getTitulo() +
                 "\nDescripción: " + e.getDescripcion() +
-                "\nFecha: " + e.getFecha().format(dateFormat) +
+                "\nFecha: " + fechaFormateada +
                 "\nMonto: " + e.getMontoRenta() +
                 "\nTipo: " + e.getTipo() +
                 (e.isCancelado() ? "\nEstado: Cancelado - Multa: " + e.getMulta() : "");
 
-        JOptionPane.showMessageDialog(this, info);
+        JOptionPane.showMessageDialog(frame, info);
     }
+
+    public static void main(String[] args) {
+    Usuario usuarioPrueba = new Admin("Administrador de Prueba", "adminTest", "Super123!", 30);
+       new EventosFrame(usuarioPrueba);
+    }
+
+    void setVisible(boolean b) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
 }
