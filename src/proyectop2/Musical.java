@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package proyectop2;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -23,6 +24,19 @@ public class Musical extends Evento {
         equipoMontaje.add(nombre);
     }
 
+    // ✅ Nuevo: agregar varios miembros de una sola vez
+    public void agregarMiembrosMontaje(List<String> nombres) {
+        equipoMontaje.addAll(nombres);
+    }
+
+    public TipoMusica getTipoMusica() {
+        return tipoMusica;
+    }
+
+    public List<String> getEquipoMontaje() {
+        return equipoMontaje;
+    }
+
     @Override
     public String getTipo() {
         return "MUSICAL";
@@ -30,14 +44,11 @@ public class Musical extends Evento {
 
     @Override
     public double getMontoRenta() {
+        // Se cobra un seguro por uso de grama del 30% sobre el valor acordado
         return montoRenta * 1.3;
     }
 
     private void setCapacidadMaxima(int capacidad) {
         this.capacidadMaxima = capacidad;
     }
-
-    
-    public TipoMusica getTipoMusica() { return tipoMusica; }
-    public List<String> getEquipoMontaje() { return equipoMontaje; }
 }
