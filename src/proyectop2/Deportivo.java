@@ -41,4 +41,11 @@ public class Deportivo extends Evento {
     private void setCapacidadMaxima(int capacidad) {
         this.capacidadMaxima = capacidad;
     }
+
+    // ✅ GETTERS
+    public String getEquipo1() { return equipo1; }
+    public String getEquipo2() { return equipo2; }
+    public TipoDeporte getTipoDeporte() { return tipoDeporte; }
+    public List<String> getJugadoresEquipo1() { return jugadoresEquipo1; }
+    public List<String> getJugadoresEquipo2() { return jugadoresEquipo2; }
 }

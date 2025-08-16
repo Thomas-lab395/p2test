@@ -16,15 +16,15 @@ public class DataStore {
     private static List<Usuario> usuarios = new ArrayList<>();
     private static List<Evento> eventos = new ArrayList<>();
 
-    // Inicialización con admin por defecto
+    
     static {
         usuarios.add(new Admin("Administrador Principal", "admin", "supersecreto", 35));
     }
 
-    // ================== USUARIOS ==================
+   
     public static boolean agregarUsuario(Usuario usuario) {
         if (buscarUsuario(usuario.getUsername()) != null) {
-            return false; // Ya existe
+            return false; 
         }
         usuarios.add(usuario);
         return true;
@@ -47,7 +47,7 @@ public class DataStore {
         return usuarios;
     }
 
-    // ================== EVENTOS ==================
+   
     public static boolean agregarEvento(Evento evento) {
         if (buscarEvento(evento.getCodigo()) != null) {
             return false; // Ya existe

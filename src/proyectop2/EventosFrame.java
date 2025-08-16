@@ -1,4 +1,4 @@
-/*
+    /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
@@ -10,21 +10,18 @@ import java.awt.*;
 import java.util.Calendar;
 
 public class EventosFrame {
-
     private Usuario usuario;
     private JFrame frame;
 
     public EventosFrame(Usuario usuario) {
         this.usuario = usuario;
 
-        // Crear la ventana principal
         frame = new JFrame("Administración de Eventos");
         frame.setSize(400, 300);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.setLayout(new GridLayout(5, 1, 10, 10));
 
-        // Botones
         JButton btnCrear = new JButton("Crear Evento");
         JButton btnEliminar = new JButton("Eliminar Evento");
         JButton btnEditar = new JButton("Editar Evento");
@@ -37,20 +34,18 @@ public class EventosFrame {
         frame.add(btnVer);
         frame.add(btnRegresar);
 
-        // Restricciones por tipo de usuario
+        // Restricciones de permisos
         if (usuario instanceof Limitado) {
             btnCrear.setEnabled(false);
             btnEditar.setEnabled(false);
         }
 
-        // Acciones
         btnCrear.addActionListener(e -> crearEvento());
         btnEliminar.addActionListener(e -> eliminarEvento());
         btnEditar.addActionListener(e -> editarEvento());
         btnVer.addActionListener(e -> verEvento());
         btnRegresar.addActionListener(e -> frame.dispose());
 
-        // Mostrar ventana
         frame.setVisible(true);
     }
 
@@ -82,7 +77,7 @@ public class EventosFrame {
             return;
         }
 
-        // Selector de fecha
+        // Fecha
         JDateChooser dateChooser = new JDateChooser();
         dateChooser.setDateFormatString("dd/MM/yyyy");
         dateChooser.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -103,6 +98,19 @@ public class EventosFrame {
 
         Calendar fecha = Calendar.getInstance();
         fecha.setTime(fechaDate);
+
+        // ✅ Validación: no permitir hoy ni fechas pasadas
+        Calendar hoy = Calendar.getInstance();
+        hoy.set(Calendar.HOUR_OF_DAY, 0);
+        hoy.set(Calendar.MINUTE, 0);
+        hoy.set(Calendar.SECOND, 0);
+        hoy.set(Calendar.MILLISECOND, 0);
+
+        if (!fecha.after(hoy)) {
+            JOptionPane.showMessageDialog(frame, "No se pueden crear eventos para hoy o fechas pasadas.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         Evento evento = null;
 
         switch (tipo) {
@@ -177,10 +185,10 @@ public class EventosFrame {
 
         if (e instanceof Deportivo dep) {
             String jugador = JOptionPane.showInputDialog(frame, "Agregar jugador a equipo 1:");
-            dep.agregarJugadorEquipo1(jugador);
+            if (jugador != null && !jugador.trim().isEmpty()) dep.agregarJugadorEquipo1(jugador);
         } else if (e instanceof Musical mus) {
             String miembro = JOptionPane.showInputDialog(frame, "Agregar miembro al equipo de montaje:");
-            mus.agregarMiembroMontaje(miembro);
+            if (miembro != null && !miembro.trim().isEmpty()) mus.agregarMiembroMontaje(miembro);
         } else if (e instanceof Religioso rel) {
             try {
                 int convertidos = Integer.parseInt(JOptionPane.showInputDialog(frame, "Cantidad de personas convertidas:"));
@@ -209,24 +217,31 @@ public class EventosFrame {
                 fechaEvento.get(Calendar.MONTH) + 1,
                 fechaEvento.get(Calendar.YEAR));
 
-        String info = "Código: " + e.getCodigo() +
-                "\nTítulo: " + e.getTitulo() +
-                "\nDescripción: " + e.getDescripcion() +
-                "\nFecha: " + fechaFormateada +
-                "\nMonto: " + e.getMontoRenta() +
-                "\nTipo: " + e.getTipo() +
-                (e.isCancelado() ? "\nEstado: Cancelado - Multa: " + e.getMulta() : "");
+        StringBuilder info = new StringBuilder();
+        info.append("Código: ").append(e.getCodigo())
+            .append("\nTítulo: ").append(e.getTitulo())
+            .append("\nDescripción: ").append(e.getDescripcion())
+            .append("\nFecha: ").append(fechaFormateada)
+            .append("\nMonto: ").append(e.getMontoRenta())
+            .append("\nTipo: ").append(e.getTipo())
+            .append("\nCapacidad: ").append(e.getCapacidadMaxima())
+            .append(e.isCancelado() ? "\nEstado: Cancelado - Multa: " + e.getMulta() : "");
 
-        JOptionPane.showMessageDialog(frame, info);
+        // Información extra por tipo
+       if (e instanceof Deportivo) {
+        Deportivo dep = (Deportivo) e;
+             info.append("\nEquipo 1: ").append(dep.getEquipo1())
+            .append("\nEquipo 2: ").append(dep.getEquipo2())
+            .append("\nDeporte: ").append(dep.getTipoDeporte())
+            .append("\nJugadores Equipo 1: ").append(dep.getJugadoresEquipo1())
+            .append("\nJugadores Equipo 2: ").append(dep.getJugadoresEquipo2());
+        } else if (e instanceof Musical) {
+        Musical mus = (Musical) e;
+        info.append("\nTipo de Música: ").append(mus.getTipoMusica())
+        .append("\nEquipo de Montaje: ").append(mus.getEquipoMontaje());
+        } else if (e instanceof Religioso) {
+    Religioso rel = (Religioso) e;
+    info.append("\nPersonas Convertidas: ").append(rel.getPersonasConvertidas());
+           }
     }
-
-    public static void main(String[] args) {
-    Usuario usuarioPrueba = new Admin("Administrador de Prueba", "adminTest", "Super123!", 30);
-       new EventosFrame(usuarioPrueba);
-    }
-
-    void setVisible(boolean b) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
 }

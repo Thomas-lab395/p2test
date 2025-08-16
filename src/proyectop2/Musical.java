@@ -30,11 +30,14 @@ public class Musical extends Evento {
 
     @Override
     public double getMontoRenta() {
-        // Añade un seguro del 30% al monto base
-        return montoRenta * 1.3;
+        return montoRenta;
     }
 
     private void setCapacidadMaxima(int capacidad) {
         this.capacidadMaxima = capacidad;
     }
+
+    // ✅ GETTERS
+    public TipoMusica getTipoMusica() { return tipoMusica; }
+    public List<String> getEquipoMontaje() { return equipoMontaje; }
 }

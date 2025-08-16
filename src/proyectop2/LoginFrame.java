@@ -24,7 +24,7 @@ public class LoginFrame extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Panel central
+      
         JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -42,7 +42,7 @@ public class LoginFrame extends JFrame {
 
         add(panel, BorderLayout.CENTER);
 
-        // Acción de login
+       
         btnLogin.addActionListener(e -> {
             String user = txtUsuario.getText().trim();
             String pass = new String(txtPassword.getPassword());

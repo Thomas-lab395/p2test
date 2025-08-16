@@ -9,12 +9,12 @@ import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 /**
  *
  * @author Mayra Bardales
  */
-
 
 public class ReportesFrame extends JFrame {
     private Usuario usuario;
@@ -47,10 +47,6 @@ public class ReportesFrame extends JFrame {
         btnIngresosFecha.addActionListener(e -> ingresosPorFecha());
         btnPerfil.addActionListener(e -> verPerfilUsuario());
         btnRegresar.addActionListener(e -> dispose());
-    }
-
-    ReportesFrame() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     private void listarRealizados() {

@@ -27,7 +27,7 @@ public class MenuPrincipalFrame extends JFrame {
         JButton btnEventos = new JButton("Administración de Eventos");
         JButton btnUsuarios = new JButton("Administración de Usuarios");
         JButton btnReportes = new JButton("Reportes");
-        JButton btnSalir = new JButton("Salir");
+        JButton btnSalir = new JButton("Cerrar Sesión");
 
         add(btnEventos);
         add(btnUsuarios);
@@ -36,16 +36,18 @@ public class MenuPrincipalFrame extends JFrame {
 
         // Permisos según tipo de usuario
         if (usuario instanceof Limitado) {
-            btnEventos.setEnabled(true); // pero en submenú no podrá crear/editar
+            btnEventos.setEnabled(true); // puede entrar pero no crear/editar
             btnUsuarios.setEnabled(false);
         } else if (usuario instanceof Contenido) {
             btnUsuarios.setEnabled(false);
         }
 
-        // Acciones
-        btnEventos.addActionListener(e -> new EventosFrame(usuario).setVisible(true));
+        btnEventos.addActionListener(e -> new EventosFrame(usuario));
         btnUsuarios.addActionListener(e -> new UsuariosFrame().setVisible(true));
-        btnReportes.addActionListener(e -> new ReportesFrame().setVisible(true));
-        btnSalir.addActionListener(e -> System.exit(0));
+        btnReportes.addActionListener(e -> new ReportesFrame(usuario).setVisible(true));
+        btnSalir.addActionListener(e -> {
+            dispose(); // Cierra menú
+            new LoginFrame().setVisible(true); // Regresa a login
+        });
     }
 }
