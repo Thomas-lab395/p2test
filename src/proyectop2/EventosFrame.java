@@ -10,6 +10,7 @@ import java.awt.*;
 import java.util.Calendar;
 
 public class EventosFrame {
+
     private Usuario usuario;
     private JFrame frame;
 
@@ -34,7 +35,6 @@ public class EventosFrame {
         frame.add(btnVer);
         frame.add(btnRegresar);
 
-        // Restricciones de permisos
         if (usuario instanceof Limitado) {
             btnCrear.setEnabled(false);
             btnEditar.setEnabled(false);
@@ -77,7 +77,6 @@ public class EventosFrame {
             return;
         }
 
-        // Fecha
         JDateChooser dateChooser = new JDateChooser();
         dateChooser.setDateFormatString("dd/MM/yyyy");
         dateChooser.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -99,15 +98,11 @@ public class EventosFrame {
         Calendar fecha = Calendar.getInstance();
         fecha.setTime(fechaDate);
 
-        // ✅ Validación: no permitir hoy ni fechas pasadas
+        // ❌ Evitar crear evento el mismo día de hoy
         Calendar hoy = Calendar.getInstance();
-        hoy.set(Calendar.HOUR_OF_DAY, 0);
-        hoy.set(Calendar.MINUTE, 0);
-        hoy.set(Calendar.SECOND, 0);
-        hoy.set(Calendar.MILLISECOND, 0);
-
-        if (!fecha.after(hoy)) {
-            JOptionPane.showMessageDialog(frame, "No se pueden crear eventos para hoy o fechas pasadas.", "Error", JOptionPane.ERROR_MESSAGE);
+        if (fecha.get(Calendar.YEAR) == hoy.get(Calendar.YEAR) &&
+            fecha.get(Calendar.DAY_OF_YEAR) == hoy.get(Calendar.DAY_OF_YEAR)) {
+            JOptionPane.showMessageDialog(frame, "No se pueden crear eventos el mismo día de hoy.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -149,7 +144,7 @@ public class EventosFrame {
         }
 
         if (!usuario.getEventosCreados().contains(codigo)) {
-            JOptionPane.showMessageDialog(frame, "Solo el creador puede eliminar este evento.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Solo el creador puede cancelar este evento.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -164,7 +159,7 @@ public class EventosFrame {
             e.cancelar(0);
         }
 
-        DataStore.eliminarEvento(codigo);
+        // ❌ YA NO se elimina de DataStore, solo se marca como cancelado
         JOptionPane.showMessageDialog(frame, "Evento cancelado. Multa: " + e.getMulta());
     }
 
@@ -184,14 +179,34 @@ public class EventosFrame {
         e.descripcion = nuevaDescripcion;
 
         if (e instanceof Deportivo dep) {
-            String jugador = JOptionPane.showInputDialog(frame, "Agregar jugador a equipo 1:");
-            if (jugador != null && !jugador.trim().isEmpty()) dep.agregarJugadorEquipo1(jugador);
+            // Equipo 1
+            while (true) {
+                String jugador1 = JOptionPane.showInputDialog(frame,
+                        "Agregar jugador a Equipo 1 (dejar vacío para terminar):");
+                if (jugador1 == null || jugador1.trim().isEmpty()) break;
+                dep.agregarJugadorEquipo1(jugador1.trim());
+            }
+
+            // Equipo 2
+            while (true) {
+                String jugador2 = JOptionPane.showInputDialog(frame,
+                        "Agregar jugador a Equipo 2 (dejar vacío para terminar):");
+                if (jugador2 == null || jugador2.trim().isEmpty()) break;
+                dep.agregarJugadorEquipo2(jugador2.trim());
+            }
+
         } else if (e instanceof Musical mus) {
-            String miembro = JOptionPane.showInputDialog(frame, "Agregar miembro al equipo de montaje:");
-            if (miembro != null && !miembro.trim().isEmpty()) mus.agregarMiembroMontaje(miembro);
+            while (true) {
+                String miembro = JOptionPane.showInputDialog(frame,
+                        "Agregar miembro al equipo de montaje (dejar vacío para terminar):");
+                if (miembro == null || miembro.trim().isEmpty()) break;
+                mus.agregarMiembroMontaje(miembro.trim());
+            }
+
         } else if (e instanceof Religioso rel) {
             try {
-                int convertidos = Integer.parseInt(JOptionPane.showInputDialog(frame, "Cantidad de personas convertidas:"));
+                int convertidos = Integer.parseInt(JOptionPane.showInputDialog(frame,
+                        "Cantidad de personas convertidas:", rel.getPersonasConvertidas()));
                 rel.setPersonasConvertidas(convertidos);
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(frame, "Número inválido.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -219,29 +234,29 @@ public class EventosFrame {
 
         StringBuilder info = new StringBuilder();
         info.append("Código: ").append(e.getCodigo())
-            .append("\nTítulo: ").append(e.getTitulo())
-            .append("\nDescripción: ").append(e.getDescripcion())
-            .append("\nFecha: ").append(fechaFormateada)
-            .append("\nMonto: ").append(e.getMontoRenta())
-            .append("\nTipo: ").append(e.getTipo())
-            .append("\nCapacidad: ").append(e.getCapacidadMaxima())
-            .append(e.isCancelado() ? "\nEstado: Cancelado - Multa: " + e.getMulta() : "");
+                .append("\nTítulo: ").append(e.getTitulo())
+                .append("\nDescripción: ").append(e.getDescripcion())
+                .append("\nFecha: ").append(fechaFormateada)
+                .append("\nMonto: ").append(e.getMontoRenta())
+                .append("\nTipo: ").append(e.getTipo());
 
-        // Información extra por tipo
-       if (e instanceof Deportivo) {
-        Deportivo dep = (Deportivo) e;
-             info.append("\nEquipo 1: ").append(dep.getEquipo1())
-            .append("\nEquipo 2: ").append(dep.getEquipo2())
-            .append("\nDeporte: ").append(dep.getTipoDeporte())
-            .append("\nJugadores Equipo 1: ").append(dep.getJugadoresEquipo1())
-            .append("\nJugadores Equipo 2: ").append(dep.getJugadoresEquipo2());
-        } else if (e instanceof Musical) {
-        Musical mus = (Musical) e;
-        info.append("\nTipo de Música: ").append(mus.getTipoMusica())
-        .append("\nEquipo de Montaje: ").append(mus.getEquipoMontaje());
-        } else if (e instanceof Religioso) {
-    Religioso rel = (Religioso) e;
-    info.append("\nPersonas Convertidas: ").append(rel.getPersonasConvertidas());
-           }
+        if (e instanceof Deportivo dep) {
+            info.append("\nEquipo 1: ").append(dep.getEquipo1())
+                    .append("\nEquipo 2: ").append(dep.getEquipo2())
+                    .append("\nDeporte: ").append(dep.getTipoDeporte())
+                    .append("\nJugadores Equipo 1: ").append(dep.getJugadoresEquipo1())
+                    .append("\nJugadores Equipo 2: ").append(dep.getJugadoresEquipo2());
+        } else if (e instanceof Musical mus) {
+            info.append("\nTipo de Música: ").append(mus.getTipoMusica())
+                    .append("\nEquipo de Montaje: ").append(mus.getEquipoMontaje());
+        } else if (e instanceof Religioso rel) {
+            info.append("\nPersonas Convertidas: ").append(rel.getPersonasConvertidas());
+        }
+
+        if (e.isCancelado()) {
+            info.append("\nEstado: Cancelado - Multa: ").append(e.getMulta());
+        }
+
+        JOptionPane.showMessageDialog(frame, info.toString());
     }
 }

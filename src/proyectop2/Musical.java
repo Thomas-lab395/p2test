@@ -30,14 +30,14 @@ public class Musical extends Evento {
 
     @Override
     public double getMontoRenta() {
-        return montoRenta;
+        return montoRenta * 1.3;
     }
 
     private void setCapacidadMaxima(int capacidad) {
         this.capacidadMaxima = capacidad;
     }
 
-    // ✅ GETTERS
+    
     public TipoMusica getTipoMusica() { return tipoMusica; }
     public List<String> getEquipoMontaje() { return equipoMontaje; }
 }

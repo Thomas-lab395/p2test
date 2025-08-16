@@ -26,13 +26,12 @@ public class Religioso extends Evento {
 
     @Override
     public double getMontoRenta() {
-        return montoRenta;
+        return montoRenta + 2000;
     }
 
     private void setCapacidadMaxima(int capacidad) {
         this.capacidadMaxima = capacidad;
     }
 
-    // ✅ GETTER
     public int getPersonasConvertidas() { return personasConvertidas; }
 }
