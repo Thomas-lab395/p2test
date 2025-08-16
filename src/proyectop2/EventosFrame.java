@@ -52,87 +52,110 @@ public class EventosFrame {
     }
 
     private void crearEvento() {
-        String[] tipos = {"DEPORTIVO", "MUSICAL", "RELIGIOSO"};
-        String tipo = (String) JOptionPane.showInputDialog(frame, "Seleccione tipo de evento", "Tipo",
-                JOptionPane.QUESTION_MESSAGE, null, tipos, tipos[0]);
+    String[] tipos = {"DEPORTIVO", "MUSICAL", "RELIGIOSO"};
+    String tipo = (String) JOptionPane.showInputDialog(frame, "Seleccione tipo de evento", "Tipo",
+            JOptionPane.QUESTION_MESSAGE, null, tipos, tipos[0]);
 
-        if (tipo == null) return;
+    if (tipo == null) return;
 
-        String codigo = JOptionPane.showInputDialog(frame, "Código único del evento:");
-        if (codigo == null || codigo.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(frame, "Código inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+    String codigo = JOptionPane.showInputDialog(frame, "Código único del evento:");
+    if (codigo == null || codigo.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(frame, "Código inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    String titulo = JOptionPane.showInputDialog(frame, "Título del evento:");
+    if (titulo == null || titulo.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(frame, "Título inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    String descripcion = JOptionPane.showInputDialog(frame, "Descripción:");
+    if (descripcion == null) descripcion = "";
+
+    double monto;
+    try {
+        monto = Double.parseDouble(JOptionPane.showInputDialog(frame, "Monto de renta:"));
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(frame, "Monto inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    JDateChooser dateChooser = new JDateChooser();
+    dateChooser.setDateFormatString("dd/MM/yyyy");
+    dateChooser.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+
+    int option = JOptionPane.showConfirmDialog(frame, dateChooser, "Seleccione la fecha",
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+    if (option != JOptionPane.OK_OPTION) {
+        JOptionPane.showMessageDialog(frame, "Operación cancelada.", "Info", JOptionPane.INFORMATION_MESSAGE);
+        return;
+    }
+
+    java.util.Date fechaDate = dateChooser.getDate();
+    if (fechaDate == null) {
+        JOptionPane.showMessageDialog(frame, "Fecha inválida.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    Calendar fecha = Calendar.getInstance();
+    fecha.setTime(fechaDate);
+
+    // ❌ Evitar crear evento el mismo día de hoy
+    Calendar hoy = Calendar.getInstance();
+    if (fecha.get(Calendar.YEAR) == hoy.get(Calendar.YEAR) &&
+        fecha.get(Calendar.DAY_OF_YEAR) == hoy.get(Calendar.DAY_OF_YEAR)) {
+        JOptionPane.showMessageDialog(frame, "No se pueden crear eventos el mismo día de hoy.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    // ❌ Evitar crear evento si ya existe otro en la misma fecha
+    for (Evento ev : DataStore.getEventos()) {
+        Calendar f = ev.getFecha();
+        if (f.get(Calendar.YEAR) == fecha.get(Calendar.YEAR) &&
+            f.get(Calendar.DAY_OF_YEAR) == fecha.get(Calendar.DAY_OF_YEAR) &&
+            !ev.isCancelado()) {
+
+            String fechaFormateada = String.format("%02d/%02d/%04d",
+                    f.get(Calendar.DAY_OF_MONTH),
+                    f.get(Calendar.MONTH) + 1,
+                    f.get(Calendar.YEAR));
+
+            JOptionPane.showMessageDialog(frame,
+                    "Ya existe un evento reservado ese día:\n" +
+                    "- Código: " + ev.getCodigo() +
+                    "\n- Tipo: " + ev.getTipo() +
+                    "\n- Título: " + ev.getTitulo() +
+                    "\n- Fecha: " + fechaFormateada,
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return;
-        }
-        String titulo = JOptionPane.showInputDialog(frame, "Título del evento:");
-        if (titulo == null || titulo.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(frame, "Título inválido.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        String descripcion = JOptionPane.showInputDialog(frame, "Descripción:");
-        if (descripcion == null) descripcion = "";
-
-        double monto;
-        try {
-            monto = Double.parseDouble(JOptionPane.showInputDialog(frame, "Monto de renta:"));
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(frame, "Monto inválido.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        JDateChooser dateChooser = new JDateChooser();
-        dateChooser.setDateFormatString("dd/MM/yyyy");
-        dateChooser.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-
-        int option = JOptionPane.showConfirmDialog(frame, dateChooser, "Seleccione la fecha",
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-        if (option != JOptionPane.OK_OPTION) {
-            JOptionPane.showMessageDialog(frame, "Operación cancelada.", "Info", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-
-        java.util.Date fechaDate = dateChooser.getDate();
-        if (fechaDate == null) {
-            JOptionPane.showMessageDialog(frame, "Fecha inválida.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        Calendar fecha = Calendar.getInstance();
-        fecha.setTime(fechaDate);
-
-        // ❌ Evitar crear evento el mismo día de hoy
-        Calendar hoy = Calendar.getInstance();
-        if (fecha.get(Calendar.YEAR) == hoy.get(Calendar.YEAR) &&
-            fecha.get(Calendar.DAY_OF_YEAR) == hoy.get(Calendar.DAY_OF_YEAR)) {
-            JOptionPane.showMessageDialog(frame, "No se pueden crear eventos el mismo día de hoy.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        Evento evento = null;
-
-        switch (tipo) {
-            case "DEPORTIVO" -> {
-                String eq1 = JOptionPane.showInputDialog(frame, "Nombre equipo 1:");
-                String eq2 = JOptionPane.showInputDialog(frame, "Nombre equipo 2:");
-                TipoDeporte deporte = (TipoDeporte) JOptionPane.showInputDialog(frame, "Tipo de deporte:",
-                        "Deporte", JOptionPane.QUESTION_MESSAGE, null, TipoDeporte.values(), TipoDeporte.FUTBOL);
-                evento = new Deportivo(codigo, titulo, descripcion, fecha, monto, eq1, eq2, deporte);
-            }
-            case "MUSICAL" -> {
-                TipoMusica musica = (TipoMusica) JOptionPane.showInputDialog(frame, "Tipo de música:",
-                        "Música", JOptionPane.QUESTION_MESSAGE, null, TipoMusica.values(), TipoMusica.POP);
-                evento = new Musical(codigo, titulo, descripcion, fecha, monto, musica);
-            }
-            case "RELIGIOSO" -> evento = new Religioso(codigo, titulo, descripcion, fecha, monto);
-        }
-
-        if (DataStore.agregarEvento(evento)) {
-            usuario.agregarEvento(codigo);
-            JOptionPane.showMessageDialog(frame, "Evento creado con éxito.");
-        } else {
-            JOptionPane.showMessageDialog(frame, "El código ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    Evento evento = null;
+
+    switch (tipo) {
+        case "DEPORTIVO" -> {
+            String eq1 = JOptionPane.showInputDialog(frame, "Nombre equipo 1:");
+            String eq2 = JOptionPane.showInputDialog(frame, "Nombre equipo 2:");
+            TipoDeporte deporte = (TipoDeporte) JOptionPane.showInputDialog(frame, "Tipo de deporte:",
+                    "Deporte", JOptionPane.QUESTION_MESSAGE, null, TipoDeporte.values(), TipoDeporte.FUTBOL);
+            evento = new Deportivo(codigo, titulo, descripcion, fecha, monto, eq1, eq2, deporte);
+        }
+        case "MUSICAL" -> {
+            TipoMusica musica = (TipoMusica) JOptionPane.showInputDialog(frame, "Tipo de música:",
+                    "Música", JOptionPane.QUESTION_MESSAGE, null, TipoMusica.values(), TipoMusica.POP);
+            evento = new Musical(codigo, titulo, descripcion, fecha, monto, musica);
+        }
+        case "RELIGIOSO" -> evento = new Religioso(codigo, titulo, descripcion, fecha, monto);
+    }
+
+    if (DataStore.agregarEvento(evento)) {
+        usuario.agregarEvento(codigo);
+        JOptionPane.showMessageDialog(frame, "Evento creado con éxito.");
+    } else {
+        JOptionPane.showMessageDialog(frame, "El código ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
 
     private void eliminarEvento() {
         String codigo = JOptionPane.showInputDialog(frame, "Código del evento a cancelar:");
