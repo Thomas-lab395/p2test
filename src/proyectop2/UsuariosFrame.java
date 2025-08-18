@@ -8,12 +8,11 @@ import javax.swing.*;
 import java.awt.*;
 
 public class UsuariosFrame extends JFrame {
-    private final Usuario usuario; 
+    private final Usuario usuario;
 
     public UsuariosFrame(Usuario usuario) {
         this.usuario = usuario;
 
-       
         if (!(usuario instanceof Admin)) {
             JOptionPane.showMessageDialog(this,
                     "Acceso denegado. Solo un ADMINISTRADOR puede administrar usuarios.",
@@ -75,9 +74,15 @@ public class UsuariosFrame extends JFrame {
 
         int edad;
         try {
-            edad = Integer.parseInt(JOptionPane.showInputDialog(this, "Edad:"));
+            String edadStr = JOptionPane.showInputDialog(this, "Edad:");
+            if (edadStr == null || edadStr.trim().isEmpty()) return; 
+            edad = Integer.parseInt(edadStr);
+            if (edad < 18) {
+                JOptionPane.showMessageDialog(this, "La edad debe ser 18 o mayor.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Edad inválida.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Edad inválida. Debe ser un número.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -121,14 +126,21 @@ public class UsuariosFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "Contraseña inválida.", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
+       
         try {
             String nuevaEdadStr = JOptionPane.showInputDialog(this, "Nueva edad:", u.getEdad());
             if (nuevaEdadStr != null && !nuevaEdadStr.trim().isEmpty()) {
                 int nuevaEdad = Integer.parseInt(nuevaEdadStr);
+                if (nuevaEdad < 18) {
+                    JOptionPane.showMessageDialog(this, "La edad debe ser 18 o mayor.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 u.setEdad(nuevaEdad);
             }
-        } catch (Exception ignored) {}
-
+        } catch (NumberFormatException ignored) {
+             JOptionPane.showMessageDialog(this, "Edad inválida. Debe ser un número.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        
         JOptionPane.showMessageDialog(this, "Usuario editado con éxito.");
     }
 

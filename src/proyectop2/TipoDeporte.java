@@ -10,7 +10,6 @@ package proyectop2;
  */
 public enum TipoDeporte {
     FUTBOL(11, 20000),
-    FUTBOL_AMERICANO(20, 20000),
     RUGBY(15, 20000),
     BASEBALL(9, 20000),
     TENIS(2, 20000);

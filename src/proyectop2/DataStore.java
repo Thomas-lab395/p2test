@@ -4,84 +4,112 @@
  */
 package proyectop2;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
+import java.util.Calendar;
 
-/**
- *
- * @author Mayra Bardales
- */
+public class DataStore implements Serializable {
+    private static List<Usuario> usuarios = new ArrayList<>();
+    private static List<Evento> eventos = new ArrayList<>();
 
-
-public class DataStore {
-    private static final List<Usuario> usuarios = new ArrayList<>();
-    private static final List<Evento> eventos = new ArrayList<>();
-
-    static {
-        usuarios.add(new Admin("Administrador Principal", "admin", "supersecreto", 35)); // ✅ usuario inicial
-    }
-
-    // ---- Usuarios ----
-    public static boolean agregarUsuario(Usuario usuario) {
-        if (buscarUsuario(usuario.getUsername()) != null) return false;
-        usuarios.add(usuario);
-        return true;
+    public static boolean agregarUsuario(Usuario nuevo) {
+        if (buscarUsuario(nuevo.getUsername()) == null) {
+            return usuarios.add(nuevo);
+        }
+        return false;
     }
 
     public static Usuario buscarUsuario(String username) {
         for (Usuario u : usuarios) {
-            if (u.getUsername().equalsIgnoreCase(username)) return u;
+            if (u.getUsername().equals(username)) {
+                return u;
+            }
         }
         return null;
     }
 
     public static boolean eliminarUsuario(String username) {
-        return usuarios.removeIf(u -> u.getUsername().equalsIgnoreCase(username));
+        Usuario u = buscarUsuario(username);
+        return usuarios.remove(u);
     }
-
-    public static List<Usuario> getUsuarios() { return usuarios; }
-
-    // ---- Eventos ----
-    public static boolean agregarEvento(Evento evento) {
-        if (buscarEvento(evento.getCodigo()) != null) return false;
-        if (existeEventoEnFecha(evento.getFecha())) return false;
-        eventos.add(evento);
-        return true;
+    
+    public static boolean agregarEvento(Evento nuevo) {
+        if (buscarEvento(nuevo.getCodigo()) == null) {
+            return eventos.add(nuevo);
+        }
+        return false;
     }
-
+    
     public static Evento buscarEvento(String codigo) {
-        for (Evento e : eventos) {
-            if (e.getCodigo().equalsIgnoreCase(codigo)) return e;
+        for(Evento e : eventos) {
+            if(e.getCodigo().equals(codigo)) return e;
         }
         return null;
     }
 
-    public static boolean eliminarEvento(String codigo) {
-        return eventos.removeIf(e -> e.getCodigo().equalsIgnoreCase(codigo));
+    public static List<Evento> getEventos() {
+        return eventos;
     }
 
-    public static List<Evento> getEventos() { return eventos; }
+    public static Evento buscarEventoRecursivo(List<Evento> lista, String codigo) {
+        if (lista.isEmpty()) {
+            return null;
+        }
+        
+        Evento primerEvento = lista.get(0);
+        
+        if (primerEvento.getCodigo().equals(codigo)) {
+            return primerEvento;
+        }
+        
+        return buscarEventoRecursivo(lista.subList(1, lista.size()), codigo);
+    }
+
+    public static int contarEventosPorTipoRecursivo(List<Evento> lista, String tipo) {
+        if (lista.isEmpty()) {
+            return 0;
+        }
+        
+        Evento primerEvento = lista.get(0);
+        int contador = 0;
+        
+        if (primerEvento.getTipo().equals(tipo)) {
+            contador = 1;
+        }
+        
+        return contador + contarEventosPorTipoRecursivo(lista.subList(1, lista.size()), tipo);
+    }
+
+    public static int calcularCapacidadTotalRecursivo(List<Evento> lista) {
+        if (lista.isEmpty()) {
+            return 0;
+        }
+        
+        Evento primerEvento = lista.get(0);
+        
+        return primerEvento.getCapacidadMaxima() + calcularCapacidadTotalRecursivo(lista.subList(1, lista.size()));
+    }
 
     public static boolean existeEventoEnFecha(Calendar fecha) {
         for (Evento e : eventos) {
-            if (mismoDia(e.getFecha(), fecha)) return true;
+            if (e.getFecha().get(Calendar.YEAR) == fecha.get(Calendar.YEAR) &&
+                e.getFecha().get(Calendar.MONTH) == fecha.get(Calendar.MONTH) &&
+                e.getFecha().get(Calendar.DAY_OF_MONTH) == fecha.get(Calendar.DAY_OF_MONTH)) {
+                return true;
+            }
         }
         return false;
     }
 
-    private static boolean mismoDia(Calendar a, Calendar b) {
-        return a.get(Calendar.YEAR) == b.get(Calendar.YEAR) &&
-               a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR);
-    }
-
-    public static boolean actualizarEvento(Evento eventoActualizado) {
+    public static boolean actualizarEvento(Evento evento) {
         for (int i = 0; i < eventos.size(); i++) {
-            if (eventos.get(i).getCodigo().equalsIgnoreCase(eventoActualizado.getCodigo())) {
-                eventos.set(i, eventoActualizado);
+            if (eventos.get(i).getCodigo().equals(evento.getCodigo())) {
+                eventos.set(i, evento);
                 return true;
             }
         }
         return false;
     }
 }
+

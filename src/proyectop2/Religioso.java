@@ -5,7 +5,6 @@
 package proyectop2;
 
 import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
 
 public class Religioso extends Evento {
     protected int personasConvertidas;

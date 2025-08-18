@@ -24,7 +24,7 @@ public class CrearEventoFrame extends JFrame {
     public JComboBox<TipoDeporte> cDeporte;
     public JComboBox<TipoMusica> cMusica;
     public JTextField cJugEq1, cJugEq2, cMontaje;
-    public JTextField cConvertidos; 
+    public JTextField cConvertidos; // Ahora es una variable de instancia
 
     public CrearEventoFrame(Usuario usuario) {
         this(usuario, null);
@@ -40,6 +40,8 @@ public class CrearEventoFrame extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
+
+        // Create the top form panel with GridLayout
         JPanel form = new JPanel(new GridLayout(0, 2, 10, 10));
 
         cTipo = new JComboBox<>(new String[]{"DEPORTIVO", "MUSICAL", "RELIGIOSO"});
@@ -74,6 +76,7 @@ public class CrearEventoFrame extends JFrame {
 
         cConvertidos = new JTextField();
 
+        // Create the subForm panel that changes based on event type
         JPanel subForm = new JPanel(new GridLayout(0, 2, 10, 10));
         cTipo.addActionListener(e -> {
             subForm.removeAll();
@@ -110,6 +113,7 @@ public class CrearEventoFrame extends JFrame {
         });
         cTipo.setSelectedIndex(0);
 
+        // Precarga si es edición
         if (modoEdicion) {
             cCodigo.setText(existente.getCodigo());
             cCodigo.setEditable(false);
@@ -135,15 +139,19 @@ public class CrearEventoFrame extends JFrame {
             }
         }
 
+        // CORRECT FIX:
+        // 1. Create a main panel to hold the form and sub-form.
         JPanel mainContentPanel = new JPanel();
         mainContentPanel.setLayout(new BoxLayout(mainContentPanel, BoxLayout.Y_AXIS));
         mainContentPanel.add(form);
         mainContentPanel.add(subForm);
-        
+
+        // 2. Add the main content panel to a JScrollPane and place it in the center.
         JScrollPane scrollPane = new JScrollPane(mainContentPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         add(scrollPane, BorderLayout.CENTER);
 
+        // 3. Create the bottom button panel and place it at the bottom.
         JPanel bottom = new JPanel(new FlowLayout());
         JButton btnGuardar = new JButton(modoEdicion ? "Guardar Cambios" : "Guardar Evento");
         JButton btnRegresar = new JButton("Regresar");
@@ -168,7 +176,7 @@ public class CrearEventoFrame extends JFrame {
         String desc = cDescripcion.getText().trim();
         Date fechaDate = cFecha.getDate();
         
-
+        // Obtiene el nombre del usuario logeado para asociarlo al evento.
         String creador = usuario.getUsername();
 
         if (codigo.isEmpty() || titulo.isEmpty() || fechaDate == null) {
@@ -187,6 +195,25 @@ public class CrearEventoFrame extends JFrame {
         Calendar fecha = Calendar.getInstance();
         fecha.setTime(fechaDate);
 
+        // Validación: no se puede crear un evento en la fecha actual
+        Calendar hoy = Calendar.getInstance();
+        hoy.set(Calendar.HOUR_OF_DAY, 0);
+        hoy.set(Calendar.MINUTE, 0);
+        hoy.set(Calendar.SECOND, 0);
+        hoy.set(Calendar.MILLISECOND, 0);
+
+        Calendar fechaEvento = Calendar.getInstance();
+        fechaEvento.setTime(fechaDate);
+        fechaEvento.set(Calendar.HOUR_OF_DAY, 0);
+        fechaEvento.set(Calendar.MINUTE, 0);
+        fechaEvento.set(Calendar.SECOND, 0);
+        fechaEvento.set(Calendar.MILLISECOND, 0);
+        
+        if (fechaEvento.equals(hoy)) {
+            JOptionPane.showMessageDialog(this, "No se pueden crear eventos en la fecha actual.", "Error de Fecha", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
         if (!modoEdicion || (modoEdicion && !DataStore.buscarEvento(codigo).getFecha().equals(fecha))) {
             if (DataStore.existeEventoEnFecha(fecha)) {
                 JOptionPane.showMessageDialog(this, "Ya existe un evento en esa fecha.");
@@ -196,7 +223,8 @@ public class CrearEventoFrame extends JFrame {
 
         Evento evento = null;
         switch (tipo) {
-            case "DEPORTIVO" -> { 
+            case "DEPORTIVO" -> {
+                // Se agrega el parámetro 'creador' al constructor de Deportivo
                 Deportivo d = new Deportivo(codigo, titulo, desc, fecha, monto,
                         cEq1.getText(), cEq2.getText(),
                         (TipoDeporte) cDeporte.getSelectedItem(), creador);
@@ -215,7 +243,7 @@ public class CrearEventoFrame extends JFrame {
                 evento = d;
             }
             case "MUSICAL" -> {
-               
+                // Se agrega el parámetro 'creador' al constructor de Musical
                 Musical m = new Musical(codigo, titulo, desc, fecha, monto,
                         (TipoMusica) cMusica.getSelectedItem(), creador);
                 List<String> mont = new ArrayList<>();
@@ -226,8 +254,10 @@ public class CrearEventoFrame extends JFrame {
                 evento = m;
             }
             case "RELIGIOSO" -> {
-                
-                Religioso r = new Religioso(codigo, titulo, desc, fecha, monto, creador);
+                // Se agrega el costo extra de 2000 al monto de renta por el uso de la grama.
+                double montoTotal = monto + 2000;
+                // Se agrega el parámetro 'creador' al constructor de Religioso
+                Religioso r = new Religioso(codigo, titulo, desc, fecha, montoTotal, creador);
                 try {
                     if (modoEdicion) {
                         int convertidos = Integer.parseInt(cConvertidos.getText().trim());
@@ -243,7 +273,7 @@ public class CrearEventoFrame extends JFrame {
 
         boolean ok = false;
         if (modoEdicion) {
-           
+            // No es necesario actualizar el creador en modo edición.
             if (DataStore.actualizarEvento(evento)) {
                 ok = true;
             }
@@ -265,9 +295,4 @@ public class CrearEventoFrame extends JFrame {
         }
     }
 }
-
-
-
-
-
 

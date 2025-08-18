@@ -4,8 +4,8 @@
  */
 package proyectop2;
 
-import java.util.Calendar;
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 public abstract class Evento implements Serializable {
@@ -67,6 +67,11 @@ public abstract class Evento implements Serializable {
     public void cancelarEvento(Calendar fechaCancelacion) {
         this.cancelado = true;
         this.multa = this.montoRenta * 0.50;
+    }
+    
+    public final long diasRestantes() {
+        long diff = this.fecha.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
+        return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
     }
 
     @Override
