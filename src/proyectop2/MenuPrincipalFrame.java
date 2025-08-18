@@ -7,13 +7,8 @@ package proyectop2;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- *
- * @author Mayra Bardales
- */
-
 public class MenuPrincipalFrame extends JFrame {
-    private Usuario usuario;
+    private final Usuario usuario;
 
     public MenuPrincipalFrame(Usuario usuario) {
         this.usuario = usuario;
@@ -27,7 +22,7 @@ public class MenuPrincipalFrame extends JFrame {
         JButton btnEventos = new JButton("Administración de Eventos");
         JButton btnUsuarios = new JButton("Administración de Usuarios");
         JButton btnReportes = new JButton("Reportes");
-        JButton btnCerrarSesion = new JButton("Cerrar Sesión"); 
+        JButton btnCerrarSesion = new JButton("Cerrar Sesión");
 
         add(btnEventos);
         add(btnUsuarios);
@@ -35,21 +30,30 @@ public class MenuPrincipalFrame extends JFrame {
         add(btnCerrarSesion);
 
         if (usuario instanceof Limitado) {
-            btnEventos.setEnabled(true); 
+            btnEventos.setEnabled(true);
             btnUsuarios.setEnabled(false);
         } else if (usuario instanceof Contenido) {
             btnUsuarios.setEnabled(false);
         }
 
-       
-        btnEventos.addActionListener(e -> new EventosFrame(usuario)); 
-        btnUsuarios.addActionListener(e -> new UsuariosFrame().setVisible(true));
-        btnReportes.addActionListener(e -> new ReportesFrame(usuario).setVisible(true));
+        btnEventos.addActionListener(e -> {
+            dispose();
+            new EventosFrame(usuario).setVisible(true);
+        });
 
-       
+        btnUsuarios.addActionListener(e -> {    
+            dispose();
+            new UsuariosFrame(usuario).setVisible(true);
+        });
+
+        btnReportes.addActionListener(e -> {
+            dispose();
+            new ReportesMenuFrame(usuario).setVisible(true);
+        });
+
         btnCerrarSesion.addActionListener(e -> {
-            dispose(); 
-            new LoginFrame().setVisible(true); 
+            dispose();
+            new LoginFrame().setVisible(true);
         });
     }
 }

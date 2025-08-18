@@ -5,18 +5,23 @@
 package proyectop2;
 
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 public class Religioso extends Evento {
-    private int personasConvertidas;
+    protected int personasConvertidas;
 
-    public Religioso(String codigo, String titulo, String descripcion, Calendar fecha, double montoRenta) {
-        super(codigo, titulo, descripcion, fecha, montoRenta);
-        setCapacidadMaxima(30000);
+    public Religioso(String codigo, String titulo, String descripcion, Calendar fecha, double montoRenta, String creador) {
+        super(codigo, titulo, descripcion, fecha, montoRenta, creador);
+        this.capacidadMaxima = 20000;
         this.personasConvertidas = 0;
     }
 
-    public void setPersonasConvertidas(int cantidad) {
-        this.personasConvertidas = cantidad;
+    public int getPersonasConvertidas() {
+        return personasConvertidas;
+    }
+
+    public void setPersonasConvertidas(int personasConvertidas) {
+        this.personasConvertidas = personasConvertidas;
     }
 
     @Override
@@ -25,13 +30,10 @@ public class Religioso extends Evento {
     }
 
     @Override
-    public double getMontoRenta() {
-        return montoRenta + 2000;
-    }
+    public void cancelarEvento(Calendar fechaCancelacion) {
+        setCancelado(true);
 
-    private void setCapacidadMaxima(int capacidad) {
-        this.capacidadMaxima = capacidad;
+        this.setMulta(0);
+        this.montoRenta += 2000; 
     }
-
-    public int getPersonasConvertidas() { return personasConvertidas; }
 }

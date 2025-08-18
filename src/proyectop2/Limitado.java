@@ -5,11 +5,9 @@
 package proyectop2;
 
 public final class Limitado extends Usuario {
-
     public Limitado(String nombreCompleto, String username, String password, int edad) {
         super(nombreCompleto, username, password, edad);
     }
-
     @Override
     public String getTipoUsuario() {
         return "LIMITADO";

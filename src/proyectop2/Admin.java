@@ -7,7 +7,6 @@ package proyectop2;
 
 
 public final class Admin extends Usuario {
-
     public Admin(String nombreCompleto, String username, String password, int edad) {
         super(nombreCompleto, username, password, edad);
     }

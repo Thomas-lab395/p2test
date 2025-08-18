@@ -8,8 +8,21 @@ import javax.swing.*;
 import java.awt.*;
 
 public class UsuariosFrame extends JFrame {
+    private final Usuario usuario; 
 
-    public UsuariosFrame() {
+    public UsuariosFrame(Usuario usuario) {
+        this.usuario = usuario;
+
+       
+        if (!(usuario instanceof Admin)) {
+            JOptionPane.showMessageDialog(this,
+                    "Acceso denegado. Solo un ADMINISTRADOR puede administrar usuarios.",
+                    "Permiso denegado", JOptionPane.ERROR_MESSAGE);
+            dispose();
+            new MenuPrincipalFrame(usuario).setVisible(true);
+            return;
+        }
+
         setTitle("Administración de Usuarios");
         setSize(400, 300);
         setLocationRelativeTo(null);
@@ -29,7 +42,11 @@ public class UsuariosFrame extends JFrame {
         btnCrear.addActionListener(e -> crearUsuario());
         btnEditar.addActionListener(e -> editarUsuario());
         btnEliminar.addActionListener(e -> eliminarUsuario());
-        btnRegresar.addActionListener(e -> dispose());
+        
+        btnRegresar.addActionListener(e -> {
+            dispose();
+            new MenuPrincipalFrame(usuario).setVisible(true);
+        });
     }
 
     private void crearUsuario() {
@@ -80,15 +97,17 @@ public class UsuariosFrame extends JFrame {
 
     private void editarUsuario() {
         String username = JOptionPane.showInputDialog(this, "Username del usuario a editar:");
+        if (username == null || username.trim().isEmpty()) return; 
+
         Usuario u = DataStore.buscarUsuario(username);
         if (u == null) {
             JOptionPane.showMessageDialog(this, "Usuario no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        String nuevoNombre = JOptionPane.showInputDialog(this, "Nuevo nombre:", u.getNombreCompleto());
+        String nuevoNombre = JOptionPane.showInputDialog(this, "Nuevo nombre:", u.getNombre());
         if (nuevoNombre != null && !nuevoNombre.trim().isEmpty()) {
-            u.nombreCompleto = nuevoNombre;
+            u.setNombre(nuevoNombre);
         }
 
         String nuevaPassword;
@@ -96,7 +115,7 @@ public class UsuariosFrame extends JFrame {
             nuevaPassword = JOptionPane.showInputDialog(this, "Nueva contraseña (mín 8 caracteres, letra, número y símbolo):", u.getPassword());
             if (nuevaPassword == null) break;
             if (validarPassword(nuevaPassword)) {
-                u.password = nuevaPassword;
+                u.setPassword(nuevaPassword);
                 break;
             }
             JOptionPane.showMessageDialog(this, "Contraseña inválida.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -105,9 +124,10 @@ public class UsuariosFrame extends JFrame {
         try {
             String nuevaEdadStr = JOptionPane.showInputDialog(this, "Nueva edad:", u.getEdad());
             if (nuevaEdadStr != null && !nuevaEdadStr.trim().isEmpty()) {
-                u.edad = Integer.parseInt(nuevaEdadStr);
+                int nuevaEdad = Integer.parseInt(nuevaEdadStr);
+                u.setEdad(nuevaEdad);
             }
-        } catch (NumberFormatException ignored) {}
+        } catch (Exception ignored) {}
 
         JOptionPane.showMessageDialog(this, "Usuario editado con éxito.");
     }
@@ -124,8 +144,8 @@ public class UsuariosFrame extends JFrame {
 
     private boolean validarPassword(String pass) {
         return pass.length() >= 8 &&
-               pass.matches(".*[A-Za-z].*") &&
-               pass.matches(".*\\d.*") &&
-               pass.matches(".*[^A-Za-z0-9].*");
+                pass.matches(".*[A-Za-z].*") &&
+                pass.matches(".*\\d.*") &&
+                pass.matches(".*[^A-Za-z0-9].*");
     }
 }

@@ -3,9 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package proyectop2;
-
 public final class Contenido extends Usuario {
-
     public Contenido(String nombreCompleto, String username, String password, int edad) {
         super(nombreCompleto, username, password, edad);
     }

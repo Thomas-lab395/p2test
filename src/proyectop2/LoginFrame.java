@@ -4,57 +4,55 @@
  */
 package proyectop2;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.GridLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
-/**
- *
- * @author Mayra Bardales
- */
-
-public class LoginFrame extends JFrame {
-    private JTextField txtUsuario;
-    private JPasswordField txtPassword;
-    private JButton btnLogin;
+   public class LoginFrame extends JFrame {
 
     public LoginFrame() {
         setTitle("JAVA TICKET - Login");
-        setSize(350, 200);
+        setSize(300, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
 
-      
-        JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
 
-        panel.add(new JLabel("Usuario:"));
-        txtUsuario = new JTextField();
+        JLabel lblUsuario = new JLabel("Usuario:");
+        JTextField txtUsuario = new JTextField();
+        JLabel lblPassword = new JLabel("Contraseña:");
+        JPasswordField txtPassword = new JPasswordField();
+
+        JButton btnLogin = new JButton("Ingresar");
+        JButton btnSalir = new JButton("Salir"); 
+
+        panel.add(lblUsuario);
         panel.add(txtUsuario);
-
-        panel.add(new JLabel("Contraseña:"));
-        txtPassword = new JPasswordField();
+        panel.add(lblPassword);
         panel.add(txtPassword);
-
-        btnLogin = new JButton("Ingresar");
-        panel.add(new JLabel()); // espacio
         panel.add(btnLogin);
+        panel.add(btnSalir);
 
-        add(panel, BorderLayout.CENTER);
+        add(panel);
 
-       
         btnLogin.addActionListener(e -> {
-            String user = txtUsuario.getText().trim();
-            String pass = new String(txtPassword.getPassword());
+            String username = txtUsuario.getText();
+            String password = new String(txtPassword.getPassword());
 
-            Usuario u = DataStore.buscarUsuario(user);
-            if (u != null && u.getPassword().equals(pass)) {
-                JOptionPane.showMessageDialog(this, "Bienvenido " + u.getNombreCompleto());
-                new MenuPrincipalFrame(u).setVisible(true);
+            Usuario usuario = DataStore.buscarUsuario(username); 
+            if (usuario != null && usuario.getPassword().equals(password)) {
                 dispose();
+                new MenuPrincipalFrame(usuario).setVisible(true);
             } else {
-                JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos");
             }
         });
+
+        btnSalir.addActionListener(e -> System.exit(0)); 
     }
 }

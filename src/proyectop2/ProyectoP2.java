@@ -6,23 +6,9 @@ package proyectop2;
 
 import javax.swing.UIManager;
 
-/**
- *
- * @author Mayra Bardales
- */
 public class ProyectoP2 {
-
-  
     public static void main(String[] args) {
-        
-    try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }        
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            new LoginFrame().setVisible(true);
-          }
-        );
+        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } catch (Exception ignored) {}
+        javax.swing.SwingUtilities.invokeLater(() -> new LoginFrame().setVisible(true));
     }
 }

@@ -4,51 +4,45 @@
  */
 package proyectop2;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Musical extends Evento {
-    private TipoMusica tipoMusica;
-    private List<String> equipoMontaje;
+    protected TipoMusica tipoMusica;
+    protected List<String> equipoMontaje;
 
-    public Musical(String codigo, String titulo, String descripcion, Calendar fecha, double montoRenta,
-                   TipoMusica tipoMusica) {
-        super(codigo, titulo, descripcion, fecha, montoRenta);
-        setCapacidadMaxima(25000);
+    public Musical(String codigo, String titulo, String descripcion, Calendar fecha, double montoRenta, TipoMusica tipoMusica, String creador) {
+        super(codigo, titulo, descripcion, fecha, montoRenta, creador);
         this.tipoMusica = tipoMusica;
+        this.capacidadMaxima = tipoMusica.getCapacidadMaxima();
         this.equipoMontaje = new ArrayList<>();
     }
 
-    public void agregarMiembroMontaje(String nombre) {
-        equipoMontaje.add(nombre);
-    }
-
-    // ✅ Nuevo: agregar varios miembros de una sola vez
-    public void agregarMiembrosMontaje(List<String> nombres) {
-        equipoMontaje.addAll(nombres);
-    }
-
+   
     public TipoMusica getTipoMusica() {
         return tipoMusica;
+    }
+
+    public void setTipoMusica(TipoMusica tipoMusica) {
+        this.tipoMusica = tipoMusica;
     }
 
     public List<String> getEquipoMontaje() {
         return equipoMontaje;
     }
 
+    public void setEquipoMontaje(List<String> equipoMontaje) {
+        this.equipoMontaje = equipoMontaje;
+    }
+
+    public void agregarMiembrosMontaje(List<String> miembros) {
+        this.equipoMontaje.addAll(miembros);
+    }
+
     @Override
     public String getTipo() {
+       
         return "MUSICAL";
-    }
-
-    @Override
-    public double getMontoRenta() {
-        // Se cobra un seguro por uso de grama del 30% sobre el valor acordado
-        return montoRenta * 1.3;
-    }
-
-    private void setCapacidadMaxima(int capacidad) {
-        this.capacidadMaxima = capacidad;
     }
 }

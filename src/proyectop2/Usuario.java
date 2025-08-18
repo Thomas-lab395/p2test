@@ -22,16 +22,19 @@ public abstract class Usuario {
         this.eventosCreados = new ArrayList<>();
     }
 
-    public String getUsername() { return username; }
-    public String getPassword() { return password; }
-    public String getNombreCompleto() { return nombreCompleto; }
-    public int getEdad() { return edad; }
-    public List<String> getEventosCreados() { return eventosCreados; }
+    public String getNombre() { return nombreCompleto; }
+    public void setNombre(String nombreCompleto) { this.nombreCompleto = nombreCompleto; }
 
-    public void agregarEvento(String idEvento) {
-        eventosCreados.add(idEvento);
-    }
+    public String getUsername() { return username; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
+    public int getEdad() { return edad; }
+    public void setEdad(int edad) { this.edad = edad; }
+
+    public List<String> getEventosCreados() { return eventosCreados; }
+    public void agregarEvento(String codigo) { eventosCreados.add(codigo); }
 
     public abstract String getTipoUsuario();
-     
 }

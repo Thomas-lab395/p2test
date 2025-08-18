@@ -9,5 +9,25 @@ package proyectop2;
  * @author Mayra Bardales
  */
 public enum TipoDeporte {
-    FUTBOL, TENIS, RUGBY, BASEBALL
+    FUTBOL(11, 20000),
+    FUTBOL_AMERICANO(20, 20000),
+    RUGBY(15, 20000),
+    BASEBALL(9, 20000),
+    TENIS(2, 20000);
+
+    private final int limiteJugadores;
+    private final int capacidadMaxima;
+
+    TipoDeporte(int limiteJugadores, int capacidadMaxima) {
+        this.limiteJugadores = limiteJugadores;
+        this.capacidadMaxima = capacidadMaxima;
     }
+
+    public int getLimiteJugadores() {
+        return limiteJugadores;
+    }
+
+    public int getCapacidadMaxima() {
+        return capacidadMaxima;
+    }
+}
